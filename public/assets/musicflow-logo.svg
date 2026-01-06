@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="noteGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1db954"/>
+      <stop offset="50%" stop-color="#ff006e"/>
+      <stop offset="100%" stop-color="#00d9ff"/>
+    </linearGradient>
+    <linearGradient id="leftWaveGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1db954"/>
+      <stop offset="100%" stop-color="#ff006e"/>
+    </linearGradient>
+    <linearGradient id="rightWaveGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff006e"/>
+      <stop offset="100%" stop-color="#00d9ff"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Music Note -->
+  <circle cx="42" cy="62" r="12" fill="url(#noteGradient)"/>
+  <rect x="52" y="25" width="6" height="40" rx="3" fill="url(#noteGradient)"/>
+  <ellipse cx="62" cy="28" rx="10" ry="7" fill="url(#noteGradient)" transform="rotate(-20 62 28)"/>
+  
+  <!-- Left Sound Waves -->
+  <path d="M28 40 Q18 50 28 60" stroke="url(#leftWaveGradient)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M18 32 Q4 50 18 68" stroke="url(#leftWaveGradient)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Right Sound Waves -->
+  <path d="M72 40 Q82 50 72 60" stroke="url(#rightWaveGradient)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M82 32 Q96 50 82 68" stroke="url(#rightWaveGradient)" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>
