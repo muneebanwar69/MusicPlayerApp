@@ -177,31 +177,39 @@ export function PlayerBar() {
             {/* Content */}
             <div className="relative z-10 flex flex-col h-full p-4 md:p-8 overflow-hidden">
               {/* Header */}
-              <div className="flex justify-between items-center mb-2 md:mb-6">
-                <button
-                  onClick={() => setIsExpanded(false)}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                <div className="text-center">
-                  <h2 className="text-sm font-medium tracking-widest text-white/60 uppercase">Now Playing</h2>
+              <div className="flex items-center mb-2 md:mb-6">
+                {/* Left - Collapse button */}
+                <div className="w-10 flex justify-start">
+                  <button
+                    onClick={() => setIsExpanded(false)}
+                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </button>
                 </div>
-                {/* Lyrics Toggle Button */}
-                <motion.button
-                  onClick={() => setShowLyrics(!showLyrics)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={cn(
-                    "p-2 rounded-full transition-colors",
-                    showLyrics ? "bg-primary text-white" : "bg-white/10 hover:bg-white/20 text-white"
-                  )}
-                  title={showLyrics ? "Hide lyrics" : "Show lyrics"}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </motion.button>
+                
+                {/* Center - Title */}
+                <div className="flex-1 text-center">
+                  <h2 className="text-xs font-medium tracking-widest text-white/60 uppercase">Now Playing</h2>
+                </div>
+                
+                {/* Right - Lyrics button */}
+                <div className="w-10 flex justify-end">
+                  <motion.button
+                    onClick={() => setShowLyrics(!showLyrics)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={cn(
+                      "p-2 rounded-full transition-colors",
+                      showLyrics ? "bg-primary text-white" : "bg-white/10 hover:bg-white/20 text-white"
+                    )}
+                    title={showLyrics ? "Hide lyrics" : "Show lyrics"}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </motion.button>
+                </div>
               </div>
 
               {/* Main Content Area */}
