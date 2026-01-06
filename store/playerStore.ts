@@ -183,10 +183,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     get().playSong(prevSong)
   },
   playSong: (song) => {
-    set({ currentSong: song, isPlaying: false })
-    // Don't auto-play - user must click play button
+    // Set song and auto-play - isPlaying: true tells YouTubePlayer to start playing when ready
+    set({ currentSong: song, isPlaying: true })
     // Play history is saved in YouTubePlayer component when playback actually starts
-    // This ensures we only save songs that actually play
-    // YouTube player will handle playback via YouTubePlayer component
+    // YouTube player will handle actual playback via YouTubePlayer component
   },
 }))
