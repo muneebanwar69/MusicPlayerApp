@@ -171,13 +171,71 @@ export async function getSongDetails(videoId: string) {
 }
 
 /**
- * Get lyrics for a song
+ * Get lyrics for a song - tries multiple sources
  */
-export async function getLyrics(videoId: string) {
+export async function getLyrics(videoId: string, songTitle?: string, artistName?: string) {
   try {
     const ytmusic = await getYTMusicInstance()
-    const lyrics = await ytmusic.getLyrics(videoId)
-    return lyrics
+    
+    // First, try to get song details which may contain lyrics browseId
+    try {
+      const song = await ytmusic.getSong(videoId) as any
+      
+      // Check if song has lyrics info
+      if (song?.lyrics?.browseId) {
+        const lyricsData = await ytmusic.getLyrics(song.lyrics.browseId)
+        if (lyricsData) {
+          console.log('✅ Got lyrics from YTMusic')
+          return lyricsData
+        }
+      }
+    } catch (songError) {
+      console.log('Could not get lyrics from song details:', songError)
+    }
+    
+    // Fallback: Try external lyrics API (lyrics.ovh is free)
+    if (songTitle && artistName) {
+      try {
+        const cleanTitle = songTitle.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').trim()
+        const cleanArtist = artistName.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').trim()
+        
+        const response = await fetch(
+          `https://api.lyrics.ovh/v1/${encodeURIComponent(cleanArtist)}/${encodeURIComponent(cleanTitle)}`
+        )
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.lyrics) {
+            console.log('✅ Got lyrics from lyrics.ovh')
+            return data.lyrics
+          }
+        }
+      } catch (externalError) {
+        console.log('External lyrics API failed:', externalError)
+      }
+    }
+    
+    // Last fallback: Try searching for lyrics with song title
+    if (songTitle) {
+      try {
+        // Search for the song to get more info
+        const searchResults = await ytmusic.searchSongs(`${songTitle} ${artistName || ''}`.trim()) as any[]
+        if (searchResults && searchResults.length > 0) {
+          const matchedSong = searchResults[0]
+          if (matchedSong?.lyrics?.browseId) {
+            const lyricsData = await ytmusic.getLyrics(matchedSong.lyrics.browseId)
+            if (lyricsData) {
+              console.log('✅ Got lyrics from search result')
+              return lyricsData
+            }
+          }
+        }
+      } catch (searchError) {
+        console.log('Search for lyrics failed:', searchError)
+      }
+    }
+    
+    return null
   } catch (error: any) {
     console.error('YTMusic lyrics error:', error)
     return null

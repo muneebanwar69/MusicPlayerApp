@@ -135,13 +135,19 @@ function YouTubePlayerInner() {
           onReady: (event: any) => {
             setYouTubePlayer(event.target)
             playerRef.current = event.target
-            // Don't auto-play - only play if user explicitly clicked play
+            
             // Set initial volume
             try {
-              const { volume } = usePlayerStore.getState()
+              const { volume, isPlaying: shouldPlay } = usePlayerStore.getState()
               event.target.setVolume(volume * 100)
+              
+              // If user already clicked play while loading, start playing now
+              if (shouldPlay) {
+                console.log('Player ready, auto-playing as requested')
+                event.target.playVideo()
+              }
             } catch (error) {
-              console.error('Set volume failed:', error)
+              console.error('Player ready setup failed:', error)
             }
           },
           onStateChange: (event: any) => {
@@ -227,7 +233,7 @@ function YouTubePlayerInner() {
     return () => {
       // Cleanup handled by YouTube API
     }
-  }, [apiReady, currentSong, isPlaying, setPlaying])
+  }, [apiReady, currentSong, isPlaying, setPlaying, setYouTubePlayer, user?.uid])
 
   // Handle play/pause changes
   useEffect(() => {

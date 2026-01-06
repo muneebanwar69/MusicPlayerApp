@@ -4,13 +4,16 @@ import { getLyrics } from '@/lib/ytmusic'
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const videoId = searchParams.get('videoId')
+  const title = searchParams.get('title')
+  const artist = searchParams.get('artist')
 
   if (!videoId) {
     return NextResponse.json({ error: 'Video ID is required' }, { status: 400 })
   }
 
   try {
-    const lyrics = await getLyrics(videoId)
+    // Pass title and artist for fallback lyrics sources
+    const lyrics = await getLyrics(videoId, title || undefined, artist || undefined)
     
     if (!lyrics) {
       return NextResponse.json({ 

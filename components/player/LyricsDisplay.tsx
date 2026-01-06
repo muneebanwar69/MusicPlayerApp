@@ -38,20 +38,40 @@ export function LyricsDisplay({ onSeek, className = '' }: LyricsDisplayProps) {
       setError(null)
       
       try {
-        const response = await fetch(`/api/lyrics?videoId=${currentSong.id}`)
+        // Include title and artist for better lyrics matching
+        const params = new URLSearchParams({
+          videoId: currentSong.id,
+          ...(currentSong.title && { title: currentSong.title }),
+          ...(currentSong.channel && { artist: currentSong.channel }),
+        })
+        
+        const response = await fetch(`/api/lyrics?${params}`)
         const data = await response.json()
         
         if (data.lyrics) {
-          // ytmusic-api returns lyrics as a string, we need to parse it
-          const lyricsText = typeof data.lyrics === 'string' 
-            ? data.lyrics 
-            : data.lyrics.description || data.lyrics.text || ''
+          // Handle different formats - could be string or object
+          let lyricsText = ''
+          if (typeof data.lyrics === 'string') {
+            lyricsText = data.lyrics
+          } else if (data.lyrics.description) {
+            lyricsText = data.lyrics.description
+          } else if (data.lyrics.text) {
+            lyricsText = data.lyrics.text
+          } else if (data.lyrics.lyrics) {
+            lyricsText = data.lyrics.lyrics
+          }
           
-          setRawLyrics(lyricsText)
-          
-          // Parse lyrics into lines with estimated timestamps
-          const parsedLyrics = parseLyrics(lyricsText, currentSong.duration || 180)
-          setLyrics(parsedLyrics)
+          if (lyricsText) {
+            setRawLyrics(lyricsText)
+            
+            // Parse lyrics into lines with estimated timestamps
+            const parsedLyrics = parseLyrics(lyricsText, currentSong.duration || 180)
+            setLyrics(parsedLyrics)
+          } else {
+            setRawLyrics(null)
+            setLyrics([])
+            setError('Lyrics not available for this song')
+          }
         } else {
           setRawLyrics(null)
           setLyrics([])
@@ -68,7 +88,7 @@ export function LyricsDisplay({ onSeek, className = '' }: LyricsDisplayProps) {
     }
 
     fetchLyrics()
-  }, [currentSong?.id, currentSong?.duration])
+  }, [currentSong?.id, currentSong?.duration, currentSong?.title, currentSong?.channel])
 
   // Update active line based on current time
   useEffect(() => {

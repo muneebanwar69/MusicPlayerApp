@@ -55,19 +55,33 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   setCurrentSong: (song) => set({ currentSong: song }),
   togglePlay: () => {
-    const { youtubePlayer, isPlaying } = get()
+    const { youtubePlayer, isPlaying, currentSong } = get()
+    
+    // If no song is loaded, do nothing
+    if (!currentSong) {
+      console.log('No song loaded')
+      return
+    }
+    
+    // Update state first - this triggers the YouTubePlayer to react
+    const newPlayingState = !isPlaying
+    set({ isPlaying: newPlayingState })
+    
+    // Then try to control the player if it exists
     if (youtubePlayer) {
       try {
-        if (isPlaying) {
-          youtubePlayer.pauseVideo()
-        } else {
+        if (newPlayingState) {
           youtubePlayer.playVideo()
+        } else {
+          youtubePlayer.pauseVideo()
         }
       } catch (error) {
         console.error('Toggle play failed:', error)
+        // Player might not be ready, but state is set, so YouTubePlayer will handle it
       }
+    } else {
+      console.log('YouTube player not ready yet, state updated to:', newPlayingState)
     }
-    set((state) => ({ isPlaying: !state.isPlaying }))
   },
   setPlaying: (playing) => {
     set({ isPlaying: playing })
