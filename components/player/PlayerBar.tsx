@@ -24,7 +24,24 @@ export function PlayerBar() {
   const router = useRouter()
 
   const handleClose = () => {
+    // Stop playback first
+    const { youtubePlayer, setPlaying, setYouTubePlayer } = usePlayerStore.getState()
+    
+    try {
+      if (youtubePlayer) {
+        youtubePlayer.stopVideo()
+        youtubePlayer.destroy()
+      }
+    } catch (error) {
+      console.error('Error stopping player:', error)
+    }
+    
+    // Reset player state
+    setPlaying(false)
+    setYouTubePlayer(null)
     setCurrentSong(null)
+    setIsExpanded(false)
+    setShowLyrics(false)
   }
 
   // YouTube IFrame API handles all audio playback

@@ -36,7 +36,7 @@ export default function AppLayout({
     <div className="flex flex-col min-h-screen">
       <Sidebar />
       <BottomNav />
-      <main className="flex-1 md:ml-48 pb-24 md:pb-28 transition-all duration-300">
+      <main className="flex-1 md:ml-48 pb-24 md:pb-28 transition-all duration-300 px-4 md:px-6 lg:px-8 pt-4 md:pt-6">
         {children}
       </main>
       <PlayerBar />

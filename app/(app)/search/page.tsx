@@ -173,7 +173,7 @@ export default function SearchPage() {
     }, [debouncedQuery, results.length, user?.uid])
 
     return (
-        <div className="min-h-screen pb-32 px-6">
+        <div className="min-h-screen pb-32">
             {/* Search Section */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}

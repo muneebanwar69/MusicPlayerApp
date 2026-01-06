@@ -185,7 +185,7 @@ export default function DJPage() {
       </motion.section>
 
       {/* Recommended Songs */}
-      <div className="px-6">
+      <div>
         <motion.div
           variants={fadeIn}
           initial="initial"
