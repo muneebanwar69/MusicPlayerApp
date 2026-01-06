@@ -11,8 +11,17 @@ export const metadata: Metadata = {
   description: 'Immersive music streaming experience',
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
-  }
+    icon: '/icons/icon-192x192.svg',
+    apple: '/icons/icon-192x192.svg',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'MusicFlow',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 export const viewport = {
