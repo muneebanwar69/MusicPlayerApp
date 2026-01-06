@@ -30,8 +30,7 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
     large: 'w-64 h-64',
   }
 
-  const handlePlay = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handlePlay = () => {
     if (onPlay) {
       onPlay(song)
     } else {
@@ -42,7 +41,6 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
   return (
     <motion.div
       whileHover={{ scale: 1.05, y: -4 }}
-      whileTap={{ scale: 0.98 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onClick={handlePlay}
@@ -61,25 +59,17 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Play button - always visible but more prominent on hover */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          initial={false}
-          animate={{
-            opacity: isHovered || isCurrentlyPlaying ? 1 : 0.7,
-            scale: isHovered || isCurrentlyPlaying ? 1 : 0.9,
-          }}
-          transition={{ duration: 0.2 }}
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
         >
-          <motion.button
-            onClick={handlePlay}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          <div
             className={`
               ${isCurrentlyPlaying
                 ? 'w-16 h-16 bg-primary shadow-lg shadow-primary/50'
                 : 'w-14 h-14 bg-surface/90 dark:bg-white/90 group-hover:bg-primary group-hover:shadow-lg group-hover:shadow-primary/50'
               } 
               rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm
+              ${isHovered || isCurrentlyPlaying ? 'opacity-100 scale-100' : 'opacity-70 scale-90'}
             `}
           >
             {isCurrentlyPlaying ? (
@@ -93,8 +83,8 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
             ) : (
               <PlayIcon className="w-6 h-6 text-text-primary dark:text-gray-900 group-hover:text-white ml-0.5 transition-colors" />
             )}
-          </motion.button>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Pulse effect when playing */}
         {isCurrentlyPlaying && (
@@ -113,7 +103,10 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
         )}
 
         {/* Like button - top right */}
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        <div 
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
           <LikeButton song={song} size="small" />
         </div>
       </div>
@@ -123,7 +116,10 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
           <p className="font-semibold text-sm group-hover:text-primary transition-colors flex-1" title={song.title}>
             {truncateTitle(song.title, 15)}
           </p>
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <div 
+            className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             <LikeButton song={song} size="small" />
           </div>
         </div>

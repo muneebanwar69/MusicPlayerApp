@@ -5,6 +5,7 @@ import { usePlayerStore } from '@/store/playerStore'
 import { Controls } from './Controls'
 import { ProgressBar } from './ProgressBar'
 import { LikeButton } from '@/components/ui/LikeButton'
+import { LyricsDisplay } from './LyricsDisplay'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -14,6 +15,7 @@ import Image from 'next/image'
 
 export function PlayerBar() {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showLyrics, setShowLyrics] = useState(false)
   const {
     currentSong,
     isPlaying,
@@ -156,8 +158,9 @@ export function PlayerBar() {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 flex flex-col h-full p-6 md:p-12 overflow-y-auto">
-              <div className="flex justify-between items-start mb-8">
+            <div className="relative z-10 flex flex-col h-full p-4 md:p-8 overflow-hidden">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4 md:mb-6">
                 <button
                   onClick={() => setIsExpanded(false)}
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
@@ -167,15 +170,39 @@ export function PlayerBar() {
                 <div className="text-center">
                   <h2 className="text-sm font-medium tracking-widest text-white/60 uppercase">Now Playing</h2>
                 </div>
-                <div className="w-10" />
+                {/* Lyrics Toggle Button */}
+                <motion.button
+                  onClick={() => setShowLyrics(!showLyrics)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className={cn(
+                    "p-2 rounded-full transition-colors",
+                    showLyrics ? "bg-primary text-white" : "bg-white/10 hover:bg-white/20 text-white"
+                  )}
+                  title={showLyrics ? "Hide lyrics" : "Show lyrics"}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </motion.button>
               </div>
 
-              <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 max-w-7xl mx-auto w-full">
-                {/* Album Art */}
+              {/* Main Content Area */}
+              <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 max-w-7xl mx-auto w-full overflow-hidden">
+                {/* Album Art - Shrinks when lyrics shown */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="relative w-full aspect-square max-w-sm md:max-w-xl rounded-3xl overflow-hidden shadow-2xl shadow-primary/20"
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0,
+                  }}
+                  layout
+                  className={cn(
+                    "relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 transition-all duration-500 flex-shrink-0",
+                    showLyrics 
+                      ? "w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64" 
+                      : "w-full aspect-square max-w-[280px] md:max-w-sm lg:max-w-md"
+                  )}
                 >
                   <Image
                     src={currentSong.thumbnail}
@@ -185,11 +212,44 @@ export function PlayerBar() {
                   />
                 </motion.div>
 
-                {/* Track Info & Controls */}
-                <div className="flex flex-col w-full max-w-xl gap-8">
-                  <div className="space-y-2">
-                    <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">{currentSong.title}</h1>
-                    <p className="text-xl md:text-2xl text-white/70">{currentSong.channel}</p>
+                {/* Lyrics Panel - Shows when lyrics enabled */}
+                <AnimatePresence>
+                  {showLyrics && (
+                    <motion.div
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 50 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                      className="flex-1 h-[40vh] md:h-[50vh] lg:h-[60vh] w-full md:max-w-xl bg-black/20 rounded-2xl backdrop-blur-sm border border-white/10 overflow-hidden"
+                    >
+                      <LyricsDisplay className="h-full" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Track Info & Controls - Repositions based on lyrics state */}
+                <motion.div 
+                  layout
+                  className={cn(
+                    "flex flex-col w-full gap-4 md:gap-6",
+                    showLyrics ? "max-w-full md:max-w-md" : "max-w-xl"
+                  )}
+                >
+                  <div className="space-y-1 md:space-y-2 text-center md:text-left">
+                    <h1 className={cn(
+                      "font-bold text-white leading-tight transition-all duration-300",
+                      showLyrics 
+                        ? "text-xl md:text-2xl lg:text-3xl line-clamp-2" 
+                        : "text-2xl md:text-4xl lg:text-5xl"
+                    )}>
+                      {currentSong.title}
+                    </h1>
+                    <p className={cn(
+                      "text-white/70 transition-all duration-300",
+                      showLyrics ? "text-sm md:text-base" : "text-lg md:text-xl lg:text-2xl"
+                    )}>
+                      {currentSong.channel}
+                    </p>
                   </div>
 
                   <div className="w-full">
@@ -199,7 +259,7 @@ export function PlayerBar() {
                   <div className="flex justify-center md:justify-start">
                     <Controls />
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>

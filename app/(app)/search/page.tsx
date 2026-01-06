@@ -206,8 +206,13 @@ export default function SearchPage() {
                     </svg>
                     {searchQuery && (
                         <button
-                            onClick={() => setSearchQuery('')}
-                            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-text-secondary dark:text-white/30 hover:text-text-primary dark:hover:text-white/60 transition-colors"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setSearchQuery('')
+                            }}
+                            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-text-secondary dark:text-white/30 hover:text-text-primary dark:hover:text-white/60 transition-colors z-10"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
