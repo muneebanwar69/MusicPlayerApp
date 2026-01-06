@@ -177,7 +177,7 @@ export function PlayerBar() {
             {/* Content */}
             <div className="relative z-10 flex flex-col h-full p-4 md:p-8 overflow-hidden">
               {/* Header */}
-              <div className="flex justify-between items-center mb-4 md:mb-6">
+              <div className="flex justify-between items-center mb-2 md:mb-6">
                 <button
                   onClick={() => setIsExpanded(false)}
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
@@ -205,7 +205,7 @@ export function PlayerBar() {
               </div>
 
               {/* Main Content Area */}
-              <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 max-w-7xl mx-auto w-full overflow-hidden">
+              <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-8 max-w-7xl mx-auto w-full overflow-hidden">
                 {/* Album Art - Shrinks when lyrics shown */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -215,10 +215,10 @@ export function PlayerBar() {
                   }}
                   layout
                   className={cn(
-                    "relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 transition-all duration-500 flex-shrink-0",
+                    "relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 transition-all duration-500 flex-shrink-0",
                     showLyrics 
-                      ? "w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64" 
-                      : "w-full aspect-square max-w-[280px] md:max-w-sm lg:max-w-md"
+                      ? "w-28 h-28 md:w-48 md:h-48 lg:w-64 lg:h-64" 
+                      : "w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80"
                   )}
                 >
                   <Image
@@ -248,22 +248,22 @@ export function PlayerBar() {
                 <motion.div 
                   layout
                   className={cn(
-                    "flex flex-col w-full gap-4 md:gap-6",
+                    "flex flex-col w-full gap-3 md:gap-6",
                     showLyrics ? "max-w-full md:max-w-md" : "max-w-xl"
                   )}
                 >
-                  <div className="space-y-1 md:space-y-2 text-center md:text-left">
+                  <div className="space-y-1 text-center md:text-left">
                     <h1 className={cn(
-                      "font-bold text-white leading-tight transition-all duration-300",
+                      "font-bold text-white leading-tight transition-all duration-300 line-clamp-2",
                       showLyrics 
-                        ? "text-xl md:text-2xl lg:text-3xl line-clamp-2" 
-                        : "text-2xl md:text-4xl lg:text-5xl"
+                        ? "text-lg md:text-2xl lg:text-3xl" 
+                        : "text-xl md:text-3xl lg:text-4xl"
                     )}>
                       {currentSong.title}
                     </h1>
                     <p className={cn(
-                      "text-white/70 transition-all duration-300",
-                      showLyrics ? "text-sm md:text-base" : "text-lg md:text-xl lg:text-2xl"
+                      "text-white/70 transition-all duration-300 truncate",
+                      showLyrics ? "text-sm" : "text-sm md:text-lg lg:text-xl"
                     )}>
                       {currentSong.channel}
                     </p>
