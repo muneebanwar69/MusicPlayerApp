@@ -6,26 +6,30 @@ import { cachedYouTubeSearch, batchYouTubeSearch } from './apiCache'
 
 // Popular music categories for random recommendations
 const MUSIC_CATEGORIES = [
-  'pop music',
-  'rock music',
-  'hip hop',
-  'electronic music',
-  'jazz',
+  'pop hits 2024',
+  'top rock songs',
+  'best hip hop',
+  'electronic dance music',
+  'jazz classics',
   'classical music',
-  'country music',
-  'r&b',
-  'reggae',
-  'blues',
-  'indie music',
+  'country hits',
+  'r&b soul',
+  'reggae music',
+  'blues music',
+  'indie pop',
   'alternative rock',
-  'dance music',
-  'latin music',
-  'k-pop',
-  'metal',
+  'edm hits',
+  'latin music hits',
+  'kpop hits',
+  'metal music',
   'folk music',
-  'soul music',
-  'funk',
-  'disco',
+  'soul classics',
+  'funk music',
+  'disco hits',
+  'lofi beats',
+  'chill music',
+  'workout music',
+  'party songs',
 ]
 
 /**
@@ -52,7 +56,7 @@ export async function getRandomRecommendations(limit: number = 20): Promise<Song
         continue
       }
 
-      const songs = (data.results || []).slice(0, 6).map((item: any) => ({
+      const songs = (data.results || []).slice(0, 8).map((item: any) => ({
         id: item.id,
         title: item.title,
         channel: item.channel,
@@ -61,7 +65,7 @@ export async function getRandomRecommendations(limit: number = 20): Promise<Song
       }))
 
       songs.forEach((song: Song) => {
-        if (!seenIds.has(song.id)) {
+        if (!seenIds.has(song.id) && song.id) {
           allSongs.push(song)
           seenIds.add(song.id)
         }
@@ -107,7 +111,7 @@ export async function getPersonalizedRecommendations(userId: string, limit: numb
 
     // Add recent songs
     recentSongs.forEach((song) => {
-      if (!seenIds.has(song.id)) {
+      if (!seenIds.has(song.id) && song.id) {
         allSongs.push(song)
         seenIds.add(song.id)
       }
@@ -115,7 +119,7 @@ export async function getPersonalizedRecommendations(userId: string, limit: numb
 
     // Add liked songs
     likedSongs.slice(0, 5).forEach((song) => {
-      if (!seenIds.has(song.id)) {
+      if (!seenIds.has(song.id) && song.id) {
         allSongs.push(song)
         seenIds.add(song.id)
       }
@@ -134,7 +138,7 @@ export async function getPersonalizedRecommendations(userId: string, limit: numb
         continue
       }
 
-      const songs = (data.results || []).slice(0, 4).map((item: any) => ({
+      const songs = (data.results || []).slice(0, 5).map((item: any) => ({
         id: item.id,
         title: item.title,
         channel: item.channel,
@@ -143,7 +147,7 @@ export async function getPersonalizedRecommendations(userId: string, limit: numb
       }))
       
       songs.forEach((song: Song) => {
-        if (!seenIds.has(song.id) && allSongs.length < limit) {
+        if (!seenIds.has(song.id) && song.id && allSongs.length < limit) {
           allSongs.push(song)
           seenIds.add(song.id)
         }
@@ -154,7 +158,7 @@ export async function getPersonalizedRecommendations(userId: string, limit: numb
     if (allSongs.length < limit) {
       const randomSongs = await getRandomRecommendations(limit - allSongs.length)
       randomSongs.forEach((song) => {
-        if (!seenIds.has(song.id)) {
+        if (!seenIds.has(song.id) && song.id) {
           allSongs.push(song)
           seenIds.add(song.id)
         }
