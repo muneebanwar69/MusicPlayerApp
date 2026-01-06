@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fadeIn, staggerContainer } from '@/lib/animations'
-import { getGreeting } from '@/lib/utils'
+import { getGreeting, truncateText } from '@/lib/utils'
 import { useUserStore } from '@/store/userStore'
 import { usePlayerStore } from '@/store/playerStore'
 import { getRecentlyPlayed, shuffleArray } from '@/lib/playHistory'
@@ -28,6 +28,7 @@ export default function HomePage() {
   const [jumpBackSongs, setJumpBackSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(true)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [hasPlayHistory, setHasPlayHistory] = useState(true)
 
   // Update time every minute for dynamic greeting
   useEffect(() => {
@@ -43,19 +44,22 @@ export default function HomePage() {
         console.log('📀 Fetched', songs.length, 'songs from history')
 
         if (songs.length > 0) {
+          setHasPlayHistory(true)
           const shuffled = shuffleArray(songs)
           setRecentSongs(shuffled)
           const jumpBack = shuffleArray(songs.slice(0, 6))
           setJumpBackSongs(jumpBack)
           console.log('✅ Updated UI with', shuffled.length, 'recent songs')
         } else {
-          console.log('📀 No play history, fetching random songs')
+          setHasPlayHistory(false)
+          console.log('📀 No play history, fetching trending songs')
           const randomSongs = await getRandomRecommendations(10)
           const shuffled = shuffleArray(randomSongs)
           setRecentSongs(shuffled)
           setJumpBackSongs(shuffleArray(randomSongs.slice(0, 6)))
         }
       } else {
+        setHasPlayHistory(false)
         const randomSongs = await getRandomRecommendations(10)
         const shuffled = shuffleArray(randomSongs)
         setRecentSongs(shuffled)
@@ -63,6 +67,7 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('❌ Error fetching recent songs:', error)
+      setHasPlayHistory(false)
       try {
         const randomSongs = await getRandomRecommendations(10)
         const shuffled = shuffleArray(randomSongs)
@@ -258,9 +263,11 @@ export default function HomePage() {
             animate={{ scale: 1 }}
             transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
           >
-            {recentSongs.length}
+            {hasPlayHistory ? recentSongs.length : 0}
           </motion.div>
-          <div className="text-sm font-medium text-text-primary/70 dark:text-white/70 mt-1">Recent Tracks</div>
+          <div className="text-sm font-medium text-text-primary/70 dark:text-white/70 mt-1">
+            {hasPlayHistory ? 'Recent Tracks' : 'Play to Start'}
+          </div>
         </motion.div>
 
         <motion.div
@@ -314,7 +321,7 @@ export default function HomePage() {
         </motion.div>
       </motion.div>
 
-      {/* Recently Played */}
+      {/* Recently Played / Trending Songs */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -335,9 +342,18 @@ export default function HomePage() {
               }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              Recently Played
+              {hasPlayHistory ? 'Recently Played' : '🔥 Trending Songs'}
             </motion.span>
           </motion.h2>
+          {!hasPlayHistory && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-text-secondary mt-2"
+            >
+              Start playing music to see your personalized history
+            </motion.p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -380,7 +396,7 @@ export default function HomePage() {
         </div>
       </motion.section>
 
-      {/* Jump Back In */}
+      {/* Jump Back In / Featured Picks */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -401,7 +417,7 @@ export default function HomePage() {
               }}
               transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
             >
-              Jump Back In
+              {hasPlayHistory ? 'Jump Back In' : '✨ Featured Picks'}
             </motion.span>
           </motion.h2>
         </div>

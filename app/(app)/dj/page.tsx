@@ -8,6 +8,7 @@ import { getPersonalizedRecommendations, getRandomRecommendations } from '@/lib/
 import { Song } from '@/store/playerStore'
 import { usePlayerStore } from '@/store/playerStore'
 import { InteractiveSongCard } from '@/components/cards/InteractiveSongCard'
+import { AudioVisualizer } from '@/components/visualizer/AudioVisualizer'
 import Image from 'next/image'
 
 export default function DJPage() {
@@ -56,7 +57,7 @@ export default function DJPage() {
 
   return (
     <div className="min-h-screen pb-32 relative">
-      {/* DJ Vinyl Record Section */}
+      {/* DJ Audio Visualizer Section */}
       <motion.section
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -64,7 +65,14 @@ export default function DJPage() {
       >
         {/* Background Glow */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-96 h-96 bg-primary/20 blur-[120px] rounded-full animate-pulse" />
+          <motion.div 
+            className="w-96 h-96 bg-primary/20 blur-[120px] rounded-full"
+            animate={isPlaying ? {
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.4, 0.2],
+            } : { scale: 1, opacity: 0.2 }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
         </div>
 
         {/* Title */}
@@ -77,79 +85,60 @@ export default function DJPage() {
             DJ Mode
           </h1>
           <p className="text-lg text-text-secondary dark:text-white/60">
-            {currentSong ? 'Now Playing' : 'Click the vinyl to start the party'}
+            {currentSong ? 'Now Playing' : 'Click play to start the party'}
           </p>
         </motion.div>
 
-        {/* Vinyl Record */}
+        {/* Audio Visualizer Ring */}
         <div className="relative z-10">
+          <AudioVisualizer size={320} barCount={60} />
+          
+          {/* Center Play/Pause Button */}
           <motion.div
-            animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
-            transition={isPlaying ? { duration: 3, repeat: Infinity, ease: "linear" } : { duration: 0.5 }}
-            className="relative w-64 h-64 md:w-80 md:h-80"
+            className="absolute inset-0 flex items-center justify-center"
           >
-            {/* Vinyl Disc */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-900 via-black to-gray-900 shadow-2xl border-8 border-gray-800">
-              {/* Grooves */}
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute inset-0 rounded-full border border-gray-700/30"
-                  style={{
-                    margin: `${i * 8}px`,
-                  }}
-                />
-              ))}
-
-              {/* Center Label */}
+            <motion.button
+              onClick={togglePlay}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-xl shadow-primary/30 flex items-center justify-center cursor-pointer group relative overflow-hidden"
+            >
+              {/* Shimmer effect */}
               <motion.div
-                animate={isPlaying ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-                transition={{ duration: 0.5, repeat: isPlaying ? Infinity : 0 }}
-                className="absolute inset-0 m-auto w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-lg flex items-center justify-center cursor-pointer group"
-                onClick={togglePlay}
-              >
-                <div className="absolute inset-0 rounded-full bg-black/40 group-hover:bg-black/20 transition-colors" />
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="relative z-10"
-                >
-                  {isPlaying ? (
-                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                    </svg>
-                  ) : (
-                    <svg className="w-12 h-12 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84z" />
-                    </svg>
-                  )}
-                </motion.div>
-              </motion.div>
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{ x: ['-200%', '200%'] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+              />
+              
+              <div className="relative z-10">
+                {isPlaying ? (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex gap-1"
+                  >
+                    <div className="w-3 h-10 bg-white rounded-sm" />
+                    <div className="w-3 h-10 bg-white rounded-sm" />
+                  </motion.div>
+                ) : (
+                  <svg className="w-12 h-12 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84z" />
+                  </svg>
+                )}
+              </div>
 
-              {/* Album Art (if playing) */}
+              {/* Album Art Background (subtle) */}
               {currentSong && (
-                <div className="absolute inset-0 m-auto w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden opacity-20 pointer-events-none">
+                <div className="absolute inset-0 rounded-full overflow-hidden opacity-30">
                   <Image
                     src={currentSong.thumbnail}
                     alt={currentSong.title}
                     fill
-                    className="object-cover"
+                    className="object-cover blur-sm"
                   />
                 </div>
               )}
-            </div>
-
-            {/* Tone Arm */}
-            <motion.div
-              animate={isPlaying ? { rotate: 25 } : { rotate: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute -right-8 top-8 origin-top-right"
-              style={{ transformOrigin: "100% 0%" }}
-            >
-              <div className="w-32 h-2 bg-gradient-to-r from-gray-700 to-gray-600 rounded-full shadow-lg relative">
-                <div className="absolute right-0 w-6 h-6 bg-gray-800 rounded-full shadow-md border-2 border-gray-600" />
-              </div>
-            </motion.div>
+            </motion.button>
           </motion.div>
 
           {/* Now Playing Info */}
@@ -165,6 +154,30 @@ export default function DJPage() {
                   {currentSong.title}
                 </h3>
                 <p className="text-text-secondary dark:text-white/60">{currentSong.channel}</p>
+                
+                {/* Sound wave animation indicator */}
+                {isPlaying && (
+                  <motion.div 
+                    className="flex items-center justify-center gap-1 mt-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    {[0.3, 0.5, 0.7, 1, 0.7, 0.5, 0.3].map((delay, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1 bg-primary rounded-full"
+                        animate={{
+                          height: [8, 20, 8],
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          delay: delay * 0.2,
+                        }}
+                      />
+                    ))}
+                  </motion.div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

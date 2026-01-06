@@ -13,6 +13,12 @@ interface InteractiveSongCardProps {
   onPlay?: (song: Song) => void
 }
 
+// Truncate text to specified length
+const truncateTitle = (text: string, maxLength: number = 15) => {
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength) + '...'
+}
+
 export function InteractiveSongCard({ song, size = 'medium', onPlay }: InteractiveSongCardProps) {
   const { playSong, currentSong, isPlaying } = usePlayerStore()
   const [isHovered, setIsHovered] = useState(false)
@@ -42,7 +48,7 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
       onClick={handlePlay}
       className="cursor-pointer group relative"
     >
-      <div className={`${sizeClasses[size]} relative rounded-2xl overflow-hidden bg-surface-elevated mb-3 shadow-md group-hover:shadow-xl transition-all duration-300 border border-border`}>
+      <div className={`${sizeClasses[size]} relative rounded-[28px] overflow-hidden bg-surface-elevated mb-3 shadow-md group-hover:shadow-xl transition-all duration-300 border border-border`}>
         <Image
           src={song.thumbnail}
           alt={song.title}
@@ -114,15 +120,15 @@ export function InteractiveSongCard({ song, size = 'medium', onPlay }: Interacti
 
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <p className="font-semibold text-sm truncate group-hover:text-primary transition-colors flex-1">
-            {song.title}
+          <p className="font-semibold text-sm group-hover:text-primary transition-colors flex-1" title={song.title}>
+            {truncateTitle(song.title, 15)}
           </p>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
             <LikeButton song={song} size="small" />
           </div>
         </div>
-        <p className="text-xs text-text-secondary truncate">
-          {song.channel}
+        <p className="text-xs text-text-secondary" title={song.channel}>
+          {truncateTitle(song.channel, 15)}
         </p>
       </div>
     </motion.div>
