@@ -94,14 +94,19 @@ export default function DJPage() {
           <AudioVisualizer size={320} barCount={60} />
           
           {/* Center Play/Pause Button */}
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-          >
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <motion.button
-              onClick={togglePlay}
-              whileHover={{ scale: 1.1 }}
+              onClick={() => {
+                // If no song is playing and we have recommendations, play the first one
+                if (!currentSong && recommendedSongs.length > 0) {
+                  handlePlayAll()
+                } else {
+                  togglePlay()
+                }
+              }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-xl shadow-primary/30 flex items-center justify-center cursor-pointer group relative overflow-hidden"
+              className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-xl shadow-primary/30 flex items-center justify-center cursor-pointer group relative overflow-hidden pointer-events-auto"
             >
               {/* Shimmer effect */}
               <motion.div
@@ -110,16 +115,13 @@ export default function DJPage() {
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
               />
               
-              <div className="relative z-10">
+              {/* Icon container - fixed size to prevent layout shift */}
+              <div className="relative z-10 w-12 h-12 flex items-center justify-center">
                 {isPlaying ? (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="flex gap-1"
-                  >
-                    <div className="w-3 h-10 bg-white rounded-sm" />
-                    <div className="w-3 h-10 bg-white rounded-sm" />
-                  </motion.div>
+                  <div className="flex gap-1.5 items-center justify-center">
+                    <div className="w-3 h-8 bg-white rounded-sm" />
+                    <div className="w-3 h-8 bg-white rounded-sm" />
+                  </div>
                 ) : (
                   <svg className="w-12 h-12 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84z" />
@@ -129,7 +131,7 @@ export default function DJPage() {
 
               {/* Album Art Background (subtle) */}
               {currentSong && (
-                <div className="absolute inset-0 rounded-full overflow-hidden opacity-30">
+                <div className="absolute inset-0 rounded-full overflow-hidden opacity-30 pointer-events-none">
                   <Image
                     src={currentSong.thumbnail}
                     alt={currentSong.title}
@@ -139,7 +141,7 @@ export default function DJPage() {
                 </div>
               )}
             </motion.button>
-          </motion.div>
+          </div>
 
           {/* Now Playing Info */}
           <AnimatePresence>

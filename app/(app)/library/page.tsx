@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fadeIn } from '@/lib/animations'
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
@@ -31,82 +31,104 @@ export default function LibraryPage() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const fetchData = async () => {
+  const fetchCollections = useCallback(async () => {
+    if (!user?.uid || !db) return []
+    
+    try {
+      console.log('📚 Fetching collections for user:', user.uid)
+      const collectionsRef = collection(db, 'collections')
+      
+      // Try with orderBy first, fallback to simple query if index doesn't exist
+      let snapshot
+      try {
+        const q = query(
+          collectionsRef,
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc')
+        )
+        snapshot = await getDocs(q)
+      } catch (indexError: any) {
+        // If index doesn't exist, fall back to simple query
+        console.warn('⚠️ Firestore index not available, using simple query:', indexError.message)
+        const simpleQ = query(collectionsRef, where('userId', '==', user.uid))
+        snapshot = await getDocs(simpleQ)
+      }
+
+      const collectionsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Collection[]
+
+      // Sort by createdAt client-side if index wasn't available
+      collectionsData.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() || 0
+        const bTime = b.createdAt?.toMillis?.() || 0
+        return bTime - aTime
+      })
+
+      console.log('✅ Fetched collections:', collectionsData.length)
+      return collectionsData
+    } catch (error: any) {
+      console.error('❌ Error fetching collections:', error)
+      return []
+    }
+  }, [user?.uid])
+
+  const fetchLikedSongs = useCallback(async () => {
+    if (!user?.uid) return []
+    
+    try {
+      console.log('❤️ Fetching liked songs for user:', user.uid)
+      const liked = await getLikedSongs(user.uid)
+      console.log('✅ Fetched liked songs:', liked.length)
+      return liked
+    } catch (error: any) {
+      console.error('❌ Error fetching liked songs:', error)
+      return []
+    }
+  }, [user?.uid])
+
+  const fetchData = useCallback(async () => {
     if (!user?.uid) {
       setLoading(false)
       return
     }
 
+    setLoading(true)
     try {
-      console.log('🔍 Starting fetchData for user:', user.uid)
+      // Fetch both in parallel
+      const [collectionsData, likedData] = await Promise.all([
+        fetchCollections(),
+        fetchLikedSongs(),
+      ])
 
-      // Fetch collections
-      if (!db) {
-        console.error('❌ Firestore not initialized')
-        return
-      }
-
-      console.log('📚 Fetching collections...')
-      const collectionsRef = collection(db, 'collections')
-      const q = query(
-        collectionsRef,
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      )
-
-      console.log('🔍 Executing query...')
-      const snapshot = await getDocs(q)
-      console.log('📊 Query result - docs count:', snapshot.docs.length)
-
-      const collectionsData = snapshot.docs.map((doc) => {
-        const data = doc.data()
-        console.log('📄 Collection doc:', doc.id, data)
-        return {
-          id: doc.id,
-          ...data,
-        }
-      }) as Collection[]
-
-      console.log('✅ Fetched collections:', collectionsData.length, collectionsData)
       setCollections(collectionsData)
-
-      // Fetch liked songs
-      const liked = await getLikedSongs(user.uid)
-      console.log('📀 Library: Fetched', liked.length, 'liked songs')
-      setLikedSongs(liked)
+      setLikedSongs(likedData)
     } catch (error: any) {
       console.error('❌ Error fetching library data:', error)
-      console.error('Error code:', error.code)
-      console.error('Error message:', error.message)
-      console.error('Full error:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [user?.uid, fetchCollections, fetchLikedSongs])
 
+  // Initial data fetch
   useEffect(() => {
     fetchData()
-  }, [user])
+  }, [fetchData])
 
-  // Refresh liked songs when a song is liked/unliked
+  // Listen for liked songs changes globally
   useEffect(() => {
     if (!user?.uid) return
 
-    const handleLikedChanged = () => {
-      console.log('🔄 Liked songs changed, refreshing...')
-      getLikedSongs(user.uid).then((liked) => {
-        console.log('📀 Refreshed liked songs:', liked.length)
-        setLikedSongs(liked)
-      }).catch(console.error)
-    }
-
-    if (activeTab === 'liked') {
-      handleLikedChanged()
+    const handleLikedChanged = async () => {
+      console.log('🔄 Liked songs changed event, refreshing...')
+      const liked = await fetchLikedSongs()
+      setLikedSongs(liked)
     }
 
     window.addEventListener('likedSongsChanged', handleLikedChanged)
     return () => window.removeEventListener('likedSongsChanged', handleLikedChanged)
-  }, [user?.uid, activeTab])
+  }, [user?.uid, fetchLikedSongs])
 
   const handlePlayAll = (songs: Song[]) => {
     if (songs.length === 0) return
@@ -129,8 +151,15 @@ export default function LibraryPage() {
     { id: 'liked' as const, label: 'Liked Songs', count: likedSongs.length },
   ]
 
+  // Callback when collection is created
+  const handleCollectionCreated = useCallback(async () => {
+    console.log('📦 Collection created, refreshing...')
+    const collectionsData = await fetchCollections()
+    setCollections(collectionsData)
+  }, [fetchCollections])
+
   return (
-    <div className="min-h-screen pb-32 relative">
+    <div className="min-h-screen pb-32 px-4 pt-4 md:px-6 md:pt-6 lg:px-8 lg:pt-8 relative">
       {/* Hero Section with Stats */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -371,7 +400,7 @@ export default function LibraryPage() {
       <CreateCollectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onCollectionCreated={fetchData}
+        onCollectionCreated={handleCollectionCreated}
       />
     </div>
   )

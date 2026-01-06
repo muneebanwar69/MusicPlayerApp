@@ -175,12 +175,12 @@ export default function CollectionPage() {
   }
 
   return (
-    <div className="p-6 pb-24 space-y-8">
+    <div className="px-4 pt-4 md:px-6 md:pt-6 lg:px-8 lg:pt-8 pb-32 space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-surface-elevated to-secondary/10 border border-white/5 p-8"
+        className="relative overflow-hidden rounded-3xl bg-surface dark:bg-gradient-to-br dark:from-primary/10 dark:via-surface-elevated dark:to-secondary/10 border-2 border-border dark:border-white/5 p-8"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-end">
@@ -189,8 +189,8 @@ export default function CollectionPage() {
           </div>
 
           <div className="flex-1 space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight">{collection.name}</h1>
-            <p className="text-lg text-white/60">{songs.length} songs • Collection</p>
+            <h1 className="text-4xl md:text-6xl font-bold text-text-primary dark:text-white tracking-tight">{collection.name}</h1>
+            <p className="text-lg text-text-secondary dark:text-white/60">{songs.length} songs • Collection</p>
 
             <div className="flex gap-4 pt-2">
               <motion.button
@@ -217,15 +217,15 @@ export default function CollectionPage() {
 
       {/* Search Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Add Songs</h2>
+        <h2 className="text-2xl font-bold text-text-primary dark:text-white">Add Songs</h2>
         <div className="relative">
-          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary dark:text-white/50" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search for songs to add..."
-            className="w-full pl-12 pr-4 py-4 bg-surface-elevated/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder:text-white/30 transition-all focus:bg-surface-elevated"
+            className="w-full pl-12 pr-4 py-4 bg-surface-elevated border-2 border-border dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary dark:text-white placeholder:text-text-secondary dark:placeholder:text-white/30 transition-all"
           />
         </div>
 
@@ -235,31 +235,31 @@ export default function CollectionPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-surface-elevated/30 rounded-xl border border-white/5 overflow-hidden backdrop-blur-sm"
+              className="bg-surface-elevated rounded-xl border-2 border-border dark:border-white/5 overflow-hidden backdrop-blur-sm"
             >
               {isSearching ? (
                 <div className="p-8 flex justify-center">
                   <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="divide-y divide-white/5">
+                <div className="divide-y divide-border dark:divide-white/5">
                   {searchResults.map((song) => {
                     const isAdded = songs.some(s => s.id === song.id)
                     return (
-                      <div key={song.id} className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors">
+                      <div key={song.id} className="flex items-center gap-4 p-4 hover:bg-surface dark:hover:bg-white/5 transition-colors">
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden">
                           <Image src={song.thumbnail} alt={song.title} fill className="object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-white truncate">{song.title}</p>
-                          <p className="text-sm text-white/50 truncate">{song.channel}</p>
+                          <p className="font-medium text-text-primary dark:text-white truncate">{song.title}</p>
+                          <p className="text-sm text-text-secondary dark:text-white/50 truncate">{song.channel}</p>
                         </div>
                         <button
                           onClick={() => !isAdded && handleAddSong(song)}
                           disabled={isAdded}
                           className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${isAdded
-                            ? 'bg-white/5 text-white/30 cursor-not-allowed'
-                            : 'bg-white/10 hover:bg-primary hover:text-white text-white'
+                            ? 'bg-surface dark:bg-white/5 text-text-secondary dark:text-white/30 cursor-not-allowed'
+                            : 'bg-surface-elevated dark:bg-white/10 hover:bg-primary hover:text-white text-text-primary dark:text-white border border-border dark:border-transparent'
                             }`}
                         >
                           {isAdded ? 'Added' : 'Add'}
@@ -276,7 +276,7 @@ export default function CollectionPage() {
 
       {/* Collection Songs */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Songs in Collection</h2>
+        <h2 className="text-2xl font-bold text-text-primary dark:text-white">Songs in Collection</h2>
         <div className="space-y-2">
           {songs.length > 0 ? (
             songs.map((song, index) => (
@@ -287,10 +287,10 @@ export default function CollectionPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ scale: 1.01, x: 4 }}
-                className="flex items-center gap-4 p-4 rounded-2xl bg-surface-elevated/30 backdrop-blur-sm hover:bg-surface-elevated/60 transition-all group cursor-pointer border border-white/5 hover:border-primary/30"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-surface-elevated dark:bg-surface-elevated/30 backdrop-blur-sm hover:bg-surface dark:hover:bg-surface-elevated/60 transition-all group cursor-pointer border-2 border-border dark:border-white/5 hover:border-primary/30"
                 onClick={() => handlePlay(song)}
               >
-                <div className="w-10 text-center text-white/50 font-semibold group-hover:text-primary transition-colors">
+                <div className="w-10 text-center text-text-secondary dark:text-white/50 font-semibold group-hover:text-primary transition-colors">
                   {currentSong?.id === song.id && isPlaying ? (
                     <div className="w-5 h-5 mx-auto border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   ) : index + 1}
@@ -306,10 +306,10 @@ export default function CollectionPage() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className={`font-semibold truncate transition-colors ${currentSong?.id === song.id ? 'text-primary' : 'text-white group-hover:text-primary'}`}>
+                  <p className={`font-semibold truncate transition-colors ${currentSong?.id === song.id ? 'text-primary' : 'text-text-primary dark:text-white group-hover:text-primary'}`}>
                     {song.title}
                   </p>
-                  <p className="text-sm text-white/50 truncate">{song.channel}</p>
+                  <p className="text-sm text-text-secondary dark:text-white/50 truncate">{song.channel}</p>
                 </div>
 
                 <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -323,15 +323,15 @@ export default function CollectionPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-16 bg-surface-elevated/30 rounded-2xl border border-dashed border-white/10"
+              className="text-center py-16 bg-surface-elevated dark:bg-surface-elevated/30 rounded-2xl border-2 border-dashed border-border dark:border-white/10"
             >
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                 <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
-              <p className="text-lg font-semibold text-white/60 mb-2">No songs yet</p>
-              <p className="text-sm text-white/40">Search above to add some!</p>
+              <p className="text-lg font-semibold text-text-primary/60 dark:text-white/60 mb-2">No songs yet</p>
+              <p className="text-sm text-text-secondary dark:text-white/40">Search above to add some!</p>
             </motion.div>
           )}
         </div>
