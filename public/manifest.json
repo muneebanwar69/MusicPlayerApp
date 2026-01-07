@@ -2,7 +2,7 @@
   "name": "MusicFlow - Your Music Player",
   "short_name": "MusicFlow",
   "description": "Stream and organize your favorite music with MusicFlow - your premium audio experience",
-  "start_url": "/",
+  "start_url": "/login",
   "id": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { auth, getFirebaseAuth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -18,6 +18,9 @@ export default function AppLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const [authChecked, setAuthChecked] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  
   useKeyboardShortcuts()
   useAnalytics()
 
@@ -27,12 +30,38 @@ export default function AppLayout({
     const authInstance = auth || getFirebaseAuth()
     const unsubscribe = onAuthStateChanged(authInstance, (user) => {
       if (!user) {
-        router.push('/login')
+        // Not authenticated - redirect to login
+        router.replace('/login')
+      } else {
+        // Authenticated - allow rendering
+        setIsAuthenticated(true)
       }
+      setAuthChecked(true)
     })
 
     return () => unsubscribe()
   }, [router])
+
+  // Show loading screen while checking authentication
+  if (!authChecked || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          {/* Logo */}
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-2xl animate-pulse">
+            <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+              <path d="M14.5 8.5 L14.5 15.5 L18 12 Z" fill="currentColor"/>
+            </svg>
+          </div>
+          {/* Loading spinner */}
+          <div className="w-8 h-8 mx-auto border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          <p className="mt-4 text-text-secondary text-sm">Loading MusicFlow...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
