@@ -9,6 +9,8 @@ import { BottomNav } from '@/components/navigation/BottomNav'
 import { PlayerBar } from '@/components/player/PlayerBar'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useAnalytics } from '@/hooks/useAnalytics'
+import { InstallPrompt, IOSInstallPrompt } from '@/components/pwa/InstallPrompt'
+import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration'
 
 export default function AppLayout({
   children,
@@ -34,12 +36,15 @@ export default function AppLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ServiceWorkerRegistration />
       <Sidebar />
       <BottomNav />
       <main className="flex-1 md:ml-48 pb-24 md:pb-28 transition-all duration-300 px-4 md:px-6 lg:px-8 pt-4 md:pt-6">
         {children}
       </main>
       <PlayerBar />
+      <InstallPrompt />
+      <IOSInstallPrompt />
     </div>
   )
 }

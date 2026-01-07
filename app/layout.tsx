@@ -8,19 +8,35 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
   title: 'MusicFlow - Premium Audio',
-  description: 'Immersive music streaming experience',
+  description: 'Immersive music streaming experience - Stream and organize your favorite music',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icons/icon-192x192.svg',
-    apple: '/icons/icon-192x192.svg',
+    icon: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.png',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'MusicFlow',
+    startupImage: '/icons/icon-512x512.png',
   },
   formatDetection: {
     telephone: false,
+  },
+  applicationName: 'MusicFlow',
+  keywords: ['music', 'streaming', 'audio', 'player', 'playlist'],
+  authors: [{ name: 'MusicFlow' }],
+  openGraph: {
+    title: 'MusicFlow - Premium Audio',
+    description: 'Stream and organize your favorite music',
+    type: 'website',
+    siteName: 'MusicFlow',
   },
 }
 
